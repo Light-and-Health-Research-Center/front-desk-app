@@ -70,6 +70,7 @@ const VisitorsScreen2 = () => {
             <NextScreenButton
               screen="VisitorsScreen3"
               disabled={continueButtonDisabled}
+              call={frontDesk.makeVisitorsCall}
             />
           </View>
         </KeyboardAvoidingView>

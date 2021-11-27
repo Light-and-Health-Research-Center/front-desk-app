@@ -1,6 +1,31 @@
 import React, { useContext, createContext, useState, useEffect } from "react";
-import { API_URL } from "../env";
 import { useNavigation } from "@react-navigation/native";
+import { initializeApp } from "firebase/app";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_APP_ID,
+} from "@env";
+
+const firebaseApp = initializeApp({
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
+});
+
+const functions = getFunctions(firebaseApp);
+const visitorsCall = httpsCallable(functions, "visitorsCall");
+const deliveriesCall = httpsCallable(functions, "deliveriesCall");
+
+const db = getFirestore();
 
 const FrontDeskContext = createContext({});
 const MAX_RESET_TIME = 600; // seconds
@@ -15,30 +40,13 @@ export function FrontDeskProvider({ children }) {
   const [timeUntilReset, setTimeUntilReset] = useState(MAX_RESET_TIME);
   const [userName, setUserName] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [employees, setEmployees] = useState([
-    {
-      label: "Michael Morrison",
-      value: "Michael Morrison",
-      containerStyle: {
-        height: "auto",
-        paddingTop: 20,
-        paddingBottom: 20,
-      },
-    },
-    {
-      label: "Allison Thayer",
-      value: "Allison Thayer",
-      containerStyle: {
-        height: "auto",
-        paddingTop: 20,
-        paddingBottom: 20,
-      },
-    },
-  ]);
+  const [firestoreData, setFirestoreData] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [numPackages, setNumPackages] = useState(0);
   const [signatureRequired, setSignatureRequired] = useState(null);
   let timer;
 
+  // Reset Timer Functions
   function updateResetTimer() {
     if (timeUntilReset <= 0) {
       backToHome();
@@ -61,19 +69,37 @@ export function FrontDeskProvider({ children }) {
 
   function backToHome() {
     resetState();
-    setTimeUntilReset(MAX_RESET_TIME);
+    resetResetTimer();
     navigation.navigate("HomeScreen");
   }
 
-  async function testAPI() {
-    try {
-      const res = await fetch(`${API_URL}/test`);
-      console.log("/test route success");
-    } catch (err) {
-      console.log("Error" + err);
+  async function getFirestoreData() {
+    const querySnapshot = await getDocs(collection(db, "PhoneNumbers"));
+    let ret = [];
+    querySnapshot.forEach((doc) => {
+      let data = doc.data();
+      data.id = doc.id;
+      ret.push(data);
+    });
+    ret.sort((a, b) => a.name > b.name);
+    setFirestoreData(ret);
+  }
+
+  function makeVisitorsCall() {
+    visitorsCall({ userName: userName, employeeID: selectedEmployee });
+  }
+
+  function makeDeliveriesCall(_signatureRequired) {
+    deliveriesCall({ numPackages, signatureRequired: _signatureRequired });
+  }
+
+  function getEmployeeNameFromID(id) {
+    for (const e of firestoreData) {
+      if (e.id === id) return e.name;
     }
   }
 
+  // Reset Timer
   useEffect(() => {
     if (!onHomeScreen) {
       timer = setTimeout(() => {
@@ -84,8 +110,28 @@ export function FrontDeskProvider({ children }) {
     }
   }, [onHomeScreen, timeUntilReset]);
 
+  // Fetch Firestore Data
+  useEffect(async () => {
+    await getFirestoreData();
+  }, []);
+
+  // Update Employees State
+  useEffect(() => {
+    let newEmployees = firestoreData.map((doc) => {
+      return {
+        label: doc.name,
+        value: doc.id,
+        containerStyle: {
+          height: "auto",
+          paddingTop: 20,
+          paddingBottom: 20,
+        },
+      };
+    });
+    setEmployees(newEmployees);
+  }, [firestoreData]);
+
   const value = {
-    testAPI,
     setOnHomeScreen,
     backToHome,
     userName,
@@ -98,6 +144,9 @@ export function FrontDeskProvider({ children }) {
     setNumPackages,
     signatureRequired,
     setSignatureRequired,
+    makeVisitorsCall,
+    makeDeliveriesCall,
+    getEmployeeNameFromID,
   };
   return (
     <FrontDeskContext.Provider value={value}>

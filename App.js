@@ -19,8 +19,11 @@ import DeliveriesScreen1 from "./screens/DeliveriesScreen1";
 import DeliveriesScreen2 from "./screens/DeliveriesScreen2";
 import DeliveriesScreen3 from "./screens/DeliveriesScreen3";
 
-//fonts
+// fonts
 import { useFonts } from "expo-font";
+
+import * as ScreenOrientation from "expo-screen-orientation";
+ScreenOrientation.unlockAsync();
 
 export default function App() {
   const [fontsLoaded] = useFonts({

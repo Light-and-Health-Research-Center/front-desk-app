@@ -29,7 +29,7 @@ const Main = () => {
             <Text style={styles.text}>You've successfully checked in.</Text>
             <Text style={styles.text}>
               If you haven't already been given instructions on where to go,
-              please call Barbara Plitnick at 555-555-5555
+              please call Barbara Plitnick at the number she provided to you.
             </Text>
             <BackToHomePageButton />
           </View>

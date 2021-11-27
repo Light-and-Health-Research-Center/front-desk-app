@@ -18,11 +18,13 @@ const DeliveriesScreen2 = () => {
 
   function setSignatureRequired() {
     frontDesk.setSignatureRequired(true);
+    frontDesk.makeDeliveriesCall(true);
     navigation.navigate("DeliveriesScreen3");
   }
 
   function setSignatureNotRequired() {
     frontDesk.setSignatureRequired(false);
+    frontDesk.makeDeliveriesCall(false);
     navigation.navigate("DeliveriesScreen3");
   }
 

@@ -3,13 +3,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ArrowCircleRightIcon } from "react-native-heroicons/solid";
 import { useNavigation } from "@react-navigation/core";
 
-const NextScreenButton = ({ screen, disabled }) => {
+const NextScreenButton = ({ screen, disabled, call = undefined }) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
       style={[styles.button, disabled && styles.buttonDisabled]}
       disabled={disabled}
       onPress={() => {
+        if (call !== undefined) {
+          call();
+        }
         navigation.navigate(screen);
       }}
     >

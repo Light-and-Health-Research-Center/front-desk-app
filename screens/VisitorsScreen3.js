@@ -26,8 +26,8 @@ const Main = () => {
           <View style={styles.contentContainer}>
             <Text style={styles.header}>Thank You</Text>
             <Text style={styles.text}>
-              {frontDesk.selectedEmployee} will be notified and should be with
-              you shortly.
+              {frontDesk.getEmployeeNameFromID(frontDesk.selectedEmployee)} will
+              be notified and should be with you shortly.
             </Text>
             <BackToHomePageButton />
           </View>
