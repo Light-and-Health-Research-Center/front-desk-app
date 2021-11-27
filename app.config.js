@@ -5,10 +5,6 @@ export default {
     version: "1.0.0",
     orientation: "landscape",
     icon: "./assets/icon.png",
-    ios: {
-      bundleIdentifier: "com.lightandhealthresearchcenter.frontdeskbot",
-      buildNumber: "1.0.0",
-    },
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
@@ -19,6 +15,8 @@ export default {
     },
     assetBundlePatterns: ["**/*"],
     ios: {
+      bundleIdentifier: "com.lightandhealthresearchcenter.frontdeskbot",
+      buildNumber: "1.0.0",
       supportsTablet: true,
       requireFullScreen: true,
     },

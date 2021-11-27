@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ArrowCircleLeftIcon } from "react-native-heroicons/solid";
-import { useNavigation } from "@react-navigation/core";
 import { useFrontDesk } from "../contexts/FrontDeskContext";
 
 const BackToHomePageButton = () => {
